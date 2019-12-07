@@ -1,6 +1,6 @@
 First proper and public drift script for FiveM! Use and share as you like.
 
-Script works on simple princip - increasing and decreasing values in handling model in real time upon pressing left Shift.
+Script works on simple principle - increasing and decreasing values in handling model in real time upon pressing left Shift.
 
 Applies appropriately for AWD vehicles too.
 
