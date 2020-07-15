@@ -37,13 +37,10 @@ function DriftOff()
 		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1])-value[2])
 	end
 	SetVehicleEnginePowerMultiplier(vehicle, 0.0)
-	SetVehicleModKit(vehicle, 0)
-	SetVehicleMod(vehicle, 11, currentEngineMod, true)
 
 	PrintDebugInfo('stock')
 
-	DrawNotification('~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!')
-	DrawNotification('Vehicle is in standard mode!')
+	DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!\nVehicle is in standard mode!")
 end
 
 function DriftOn()
@@ -58,11 +55,10 @@ function DriftOn()
 
 	PrintDebugInfo('drift')
 
-	DrawNotification('~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!')
-	DrawNotification('Enjoy driving sideways!')
+	DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!\nEnjoy driving sideways!")
 end
 
-function DrawNotification(text)
+function DrawNotif(text)
 	SetNotificationTextEntry("STRING")
 	AddTextComponentString(text)
 	DrawNotification(false, false)
