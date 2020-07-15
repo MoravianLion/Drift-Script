@@ -33,30 +33,20 @@ end)
 
 function DriftOff()
 	local currentEngineMod = GetVehicleMod(vehicle, 11)
-
-	drawNotification('~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!')
-	drawNotification('Vehicle is in standard mode!')
 	for index, value in ipairs(handleMods) do
 		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1])-value[2])
 	end
-	SetVehicleEnginePowerMultiplier(vehicle, 0.0)					
+	SetVehicleEnginePowerMultiplier(vehicle, 0.0)
 	SetVehicleModKit(vehicle, 0)
 	SetVehicleMod(vehicle, 11, currentEngineMod, true)
 
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", 'fDriveInertia'))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fSteeringLock"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveMax"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveMin"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveLateral"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fLowSpeedTractionLossMult"))
-	print('stock')
+	PrintDebugInfo('stock')
+
+	DrawNotification('~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!')
+	DrawNotification('Vehicle is in standard mode!')
 end
 
-function DriftOn()	
-	--not a drift handling? let's make it		
-	drawNotification('~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!')
-	drawNotification('Enjoy driving sideways!')
+function DriftOn()
 	for index, value in ipairs(handleMods) do
 		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1])+value[2])
 	end
@@ -65,6 +55,21 @@ function DriftOn()
 	else
 		SetVehicleEnginePowerMultiplier(vehicle, 100.0)
 	end
+
+	PrintDebugInfo('drift')
+
+	DrawNotification('~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!')
+	DrawNotification('Enjoy driving sideways!')
+end
+
+function DrawNotification(text)
+	SetNotificationTextEntry("STRING")
+	AddTextComponentString(text)
+	DrawNotification(false, false)
+end
+
+function PrintDebugInfo(mode)
+	print(mode)
 	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff"))
 	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", 'fDriveInertia'))
 	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fSteeringLock"))
@@ -72,21 +77,14 @@ function DriftOn()
 	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveMin"))
 	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveLateral"))
 	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fLowSpeedTractionLossMult"))
-	print('drift')
-end
-
-function drawNotification(text)
-    SetNotificationTextEntry("STRING")
-    AddTextComponentString(text)
-    DrawNotification(false, false)
 end
 
 function IsVehicleClassWhitelisted(vehicleClass)
 	for index, value in ipairs(vehicleClassWhitelist) do
-        if value == vehicleClass then
-            return true
-        end
-    end
+		if value == vehicleClass then
+			return true
+		end
+	end
 
-    return false
+	return false
 end
