@@ -1,3 +1,6 @@
+-- https://runtime.fivem.net/doc/natives/?_0x29439776AAA00A62
+local vehicleClassWhitelist = {0, 1, 2, 3, 4, 5, 6, 7, 9}
+
 Citizen.CreateThread( function()
 	while true do
 		Wait(1)
@@ -8,16 +11,8 @@ Citizen.CreateThread( function()
 	
 		if IsPedInAnyVehicle(ped) then	
 			if driver == ped and IsVehicleOnAllWheels(vehicle) then
-				local GetHandlingfInitialDragCoeff = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff")
-				local GetHandlingfDriveBiasFront = GetVehicleHandlingFloat(vehicle, 'CHandlingData', 'fDriveBiasFront')
-				local GetHandlingfSteeringLock = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fSteeringLock")
-				local GetHandlingfTractionCurveMax = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveMax")
-				local GetHandlingfTractionCurveMin = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveMin")
-				local GetHandlingfTractionCurveLateral = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveLateral")
-				local GetHandlingfLowSpeedTractionLossMult = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fLowSpeedTractionLossMult")
-			
-				if IsControlJustReleased(0, 21) and ((GetVehicleClass(vehicle) == 0) or (GetVehicleClass(vehicle) == 1) or (GetVehicleClass(vehicle) == 2) or (GetVehicleClass(vehicle) == 3) or (GetVehicleClass(vehicle) == 4) or (GetVehicleClass(vehicle) == 5) or (GetVehicleClass(vehicle) == 6) or (GetVehicleClass(vehicle) == 7) or (GetVehicleClass(vehicle) == 9)) then
-					if GetHandlingfInitialDragCoeff >= 50.0 then
+				if IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
+					if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff") >= 50.0 then
 						DriftOff()
 					else
 						DriftOn()
@@ -107,4 +102,14 @@ function drawNotification(text)
     SetNotificationTextEntry("STRING")
     AddTextComponentString(text)
     DrawNotification(false, false)
+end
+
+function IsVehicleClassWhitelisted(vehicleClass)
+	for index, value in ipairs(vehicleClassWhitelist) do
+        if value == vehicleClass then
+            return true
+        end
+    end
+
+    return false
 end
