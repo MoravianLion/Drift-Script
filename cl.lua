@@ -11,32 +11,27 @@ local handleMods = {
 	{"fLowSpeedTractionLossMult", -.57}
 }
 
+local ped, vehicle
+
 Citizen.CreateThread( function()
 	while true do
 		Wait(1)
-	
-		local ped = GetPlayerPed(-1)
-		local vehicle = GetVehiclePedIsIn(ped, false)
-		local driver = GetPedInVehicleSeat(vehicle, -1)
-	
-		if IsPedInAnyVehicle(ped) then	
-			if driver == ped and IsVehicleOnAllWheels(vehicle) then
-				if IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
-					if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff") >= 50.0 then
-						DriftOff()
-					else
-						DriftOn()
-					end
-			end	
+		ped = GetPlayerPed(-1)
+
+		if IsPedInAnyVehicle(ped) then
+			vehicle = GetVehiclePedIsIn(ped, false)
+			if GetPedInVehicleSeat(vehicle, -1) == ped and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
+				if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff") >= 50.0 then
+					DriftOff()
+				else
+					DriftOn()
+				end
 			end
 		end
 	end
 end)
 
 function DriftOff()
-	local ped = GetPlayerPed(-1)
-	local vehicle = GetVehiclePedIsIn(ped, false)
-
 	local currentEngineMod = GetVehicleMod(vehicle, 11)
 
 	drawNotification('~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!')
@@ -59,9 +54,6 @@ function DriftOff()
 end
 
 function DriftOn()	
-	local ped = GetPlayerPed(-1)
-	local vehicle = GetVehiclePedIsIn(ped, false)
-
 	--not a drift handling? let's make it		
 	drawNotification('~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!')
 	drawNotification('Enjoy driving sideways!')
