@@ -12,6 +12,7 @@ local handleMods = {
 }
 
 local ped, vehicle
+local driftMode = false
 
 Citizen.CreateThread( function()
 	while true do
@@ -19,27 +20,31 @@ Citizen.CreateThread( function()
 		ped = GetPlayerPed(-1)
 
 		if IsPedInAnyVehicle(ped) then
-			vehicle = GetVehiclePedIsIn(ped, false)
-			if GetPedInVehicleSeat(vehicle, -1) == ped and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
-				if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff") >= 50.0 then
+			tmpvehicle = GetVehiclePedIsIn(ped, false)
+			-- Make sure drift mode is deactivated if a new vehicle is used
+			if not(vehicle == tmpvehicle) then
+				driftMode = false
+				vehicle = tmpvehicle
+			end
+			if (GetPedInVehicleSeat(vehicle, -1) == ped) and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
+				if driftMode then
 					DriftOff()
 				else
 					DriftOn()
 				end
+				driftMode = not(driftMode)
 			end
 		end
 	end
 end)
 
 function DriftOff()
-	local currentEngineMod = GetVehicleMod(vehicle, 11)
 	for index, value in ipairs(handleMods) do
 		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1])-value[2])
 	end
 	SetVehicleEnginePowerMultiplier(vehicle, 0.0)
 
-	PrintDebugInfo('stock')
-
+	PrintDebugInfo("stock")
 	DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!\nVehicle is in standard mode!")
 end
 
@@ -53,8 +58,7 @@ function DriftOn()
 		SetVehicleEnginePowerMultiplier(vehicle, 100.0)
 	end
 
-	PrintDebugInfo('drift')
-
+	PrintDebugInfo("drift")
 	DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!\nEnjoy driving sideways!")
 end
 
@@ -66,13 +70,9 @@ end
 
 function PrintDebugInfo(mode)
 	print(mode)
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", 'fDriveInertia'))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fSteeringLock"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveMax"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveMin"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fTractionCurveLateral"))
-	print(GetVehicleHandlingFloat(vehicle, "CHandlingData", "fLowSpeedTractionLossMult"))
+	for index, value in ipairs(handleMods) do
+		print(GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1]))
+	end
 end
 
 function IsVehicleClassWhitelisted(vehicleClass)
