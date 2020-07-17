@@ -23,43 +23,44 @@ Citizen.CreateThread( function()
 			tmpvehicle = GetVehiclePedIsIn(ped, false)
 			-- Make sure drift mode is deactivated if a new vehicle is used
 			if not(vehicle == tmpvehicle) then
-				driftMode = false
+				if driftMode then
+					ToggleDrift()
+				end
 				vehicle = tmpvehicle
 			end
 			if (GetPedInVehicleSeat(vehicle, -1) == ped) and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
-				if driftMode then
-					DriftOff()
-				else
-					DriftOn()
-				end
-				driftMode = not(driftMode)
+				ToggleDrift()
 			end
 		end
 	end
 end)
 
-function DriftOff()
-	for index, value in ipairs(handleMods) do
-		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1])-value[2])
+function ToggleDrift()
+	local modifier = 1
+	if driftMode then
+		modifier = -1
 	end
-	SetVehicleEnginePowerMultiplier(vehicle, 0.0)
-
-	PrintDebugInfo("stock")
-	DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!\nVehicle is in standard mode!")
-end
-
-function DriftOn()
+	
 	for index, value in ipairs(handleMods) do
-		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1])+value[2])
+		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1]) + value[2] * modifier)
 	end
-	if GetHandlingfDriveBiasFront == 0.0 then
-		SetVehicleEnginePowerMultiplier(vehicle, 190.0)
+	
+	if driftMode then
+		SetVehicleEnginePowerMultiplier(vehicle, 0.0)
+		
+		PrintDebugInfo("stock")
+		DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!\nVehicle is in standard mode!")
 	else
-		SetVehicleEnginePowerMultiplier(vehicle, 100.0)
+		if GetHandlingfDriveBiasFront == 0.0 then
+			SetVehicleEnginePowerMultiplier(vehicle, 190.0)
+		else
+			SetVehicleEnginePowerMultiplier(vehicle, 100.0)
+		end
+		PrintDebugInfo("drift")
+		DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!\nEnjoy driving sideways!")
 	end
-
-	PrintDebugInfo("drift")
-	DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!\nEnjoy driving sideways!")
+	
+	driftMode = not(driftMode)
 end
 
 function DrawNotif(text)
