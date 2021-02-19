@@ -49,4 +49,4 @@ to
 
 This will solve the problem with vehicle getting incorrect values.
 
-We had a lot of fun with whole FiveM community and I am pleased to share this with all of you! Code is done entirely by me. Use and share as you like. If you want to make me happy, throw below in comments some videos featuring the script! :)
+We had a lot of fun with whole FiveM community and I am pleased to share this with all of you! Code is originally made by me and further optimizations by VoidMods Void. Use and share as you like. If you want to make me happy, throw below in comments some videos featuring the script! :)
