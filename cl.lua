@@ -20,16 +20,18 @@ Citizen.CreateThread( function()
 		ped = GetPlayerPed(-1)
 
 		if IsPedInAnyVehicle(ped) then
-			tmpvehicle = GetVehiclePedIsIn(ped, false)
-			-- Make sure drift mode is deactivated if a new vehicle is used
-			if not(vehicle == tmpvehicle) then
-				if driftMode then
+			local tmpvehicle = GetVehiclePedIsIn(ped, false)
+			if (GetPedInVehicleSeat(tmpvehicle, -1) == ped) then			 
+				-- Make sure drift mode is deactivated if a new vehicle is used
+				if not(vehicle == tmpvehicle) then
+					if driftMode then
+						ToggleDrift()
+					end
+					vehicle = tmpvehicle
+				end
+				if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveBiasFront") ~= 1 and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
 					ToggleDrift()
 				end
-				vehicle = tmpvehicle
-			end
-			if (GetPedInVehicleSeat(vehicle, -1) == ped) and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
-				ToggleDrift()
 			end
 		end
 	end
