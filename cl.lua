@@ -25,6 +25,15 @@ Citizen.CreateThread( function()
 				if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveBiasFront") ~= 1 and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
 					ToggleDrift(vehicle)
 				end
+				if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff") < 90 then
+					SetVehicleEnginePowerMultiplier(vehicle, 0.0)
+				else
+					if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveBiasFront") == 0.0 then
+						SetVehicleEnginePowerMultiplier(vehicle, 190.0)
+					else
+						SetVehicleEnginePowerMultiplier(vehicle, 100.0)
+					end
+				end
 			end
 		end
 	end
@@ -48,16 +57,11 @@ function ToggleDrift(vehicle)
 	end
 	
 	if driftMode then
-		SetVehicleEnginePowerMultiplier(vehicle, 0.0)
 		
 		PrintDebugInfo("stock")
 		DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~g~on~s~!\nVehicle is in standard mode!")
 	else
-		if GetHandlingfDriveBiasFront == 0.0 then
-			SetVehicleEnginePowerMultiplier(vehicle, 190.0)
-		else
-			SetVehicleEnginePowerMultiplier(vehicle, 100.0)
-		end
+		
 		PrintDebugInfo("drift")
 		DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!\nEnjoy driving sideways!")
 	end
@@ -88,3 +92,4 @@ function IsVehicleClassWhitelisted(vehicleClass)
 
 	return false
 end
+
