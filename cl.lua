@@ -20,25 +20,25 @@ Citizen.CreateThread( function()
 		ped = GetPlayerPed(-1)
 
 		if IsPedInAnyVehicle(ped) then
-			local tmpvehicle = GetVehiclePedIsIn(ped, false)
-			if (GetPedInVehicleSeat(tmpvehicle, -1) == ped) then			 
-				-- Make sure drift mode is deactivated if a new vehicle is used
-				if not(vehicle == tmpvehicle) then
-					if driftMode then
-						ToggleDrift()
-					end
-					vehicle = tmpvehicle
-				end
+			local vehicle = GetVehiclePedIsIn(ped, false)
+			if (GetPedInVehicleSeat(vehicle, -1) == ped) then			 
 				if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveBiasFront") ~= 1 and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
-					ToggleDrift()
+					ToggleDrift(vehicle)
 				end
 			end
 		end
 	end
 end)
 
-function ToggleDrift()
+function ToggleDrift(vehicle)
 	local modifier = 1
+	
+	if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff") > 90 then
+		driftMode = true
+	else 
+		driftMode = false
+	end
+	
 	if driftMode then
 		modifier = -1
 	end
@@ -62,7 +62,6 @@ function ToggleDrift()
 		DrawNotif("~y~TCS~s~, ~y~ABS~s~, ~y~ESP ~s~is ~r~OFF~s~!\nEnjoy driving sideways!")
 	end
 	
-	driftMode = not(driftMode)
 end
 
 function DrawNotif(text)
@@ -72,6 +71,8 @@ function DrawNotif(text)
 end
 
 function PrintDebugInfo(mode)
+	ped = GetPlayerPed(-1)
+	local vehicle = GetVehiclePedIsIn(ped, false)
 	print(mode)
 	for index, value in ipairs(handleMods) do
 		print(GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1]))
