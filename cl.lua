@@ -11,18 +11,22 @@ local handleMods = {
 	{"fLowSpeedTractionLossMult", -.57}
 }
 
-local ped, vehicle
+actionKeyPressed = IsControlJustReleased(0, 21)
+
 local driftMode = false
 
 Citizen.CreateThread( function()
 	while true do
 		Wait(1)
-		ped = GetPlayerPed(-1)
+		local ped = PlayerPedId()
+		local vehicle = GetVehiclePedIsIn(ped, false)
+		local GetVehicleHandlingFloat = GetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveBiasFront")
+		local isWhitelisted = IsVehicleClassWhitelisted(GetVehicleClass(vehicle))
+		local getDriver = GetPedInVehicleSeat(vehicle, -1)
 
 		if IsPedInAnyVehicle(ped) then
-			local vehicle = GetVehiclePedIsIn(ped, false)
-			if (GetPedInVehicleSeat(vehicle, -1) == ped) then			 
-				if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fDriveBiasFront") ~= 1 and IsVehicleOnAllWheels(vehicle) and IsControlJustReleased(0, 21) and IsVehicleClassWhitelisted(GetVehicleClass(vehicle)) then
+			if (getDriver == ped) then			 
+				if vehHandlingFloat ~= 1 and IsVehicleOnAllWheels(vehicle) and actionKeyPressed and isWhitelisted then
 					ToggleDrift(vehicle)
 				end
 				if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff") < 90 then
@@ -41,8 +45,9 @@ end)
 
 function ToggleDrift(vehicle)
 	local modifier = 1
+	local GetVehicleHandlingFloat = GetVehicleHandlingFloat(vehicle, "CHandlingData")
 	
-	if GetVehicleHandlingFloat(vehicle, "CHandlingData", "fInitialDragCoeff") > 90 then
+	if GetVehicleHandlingFloat > 90 then
 		driftMode = true
 	else 
 		driftMode = false
@@ -53,7 +58,7 @@ function ToggleDrift(vehicle)
 	end
 	
 	for index, value in ipairs(handleMods) do
-		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1]) + value[2] * modifier)
+		SetVehicleHandlingFloat(vehicle, "CHandlingData", value[1], GetVehicleHandlingFloat, value[1]) + value[2] * modifier)
 	end
 	
 	if driftMode then
@@ -75,11 +80,12 @@ function DrawNotif(text)
 end
 
 function PrintDebugInfo(mode)
-	ped = GetPlayerPed(-1)
+	local ped = PlayerPedId()
 	local vehicle = GetVehiclePedIsIn(ped, false)
+	local GetVehicleHandlingFloat = GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1])
 	print(mode)
 	for index, value in ipairs(handleMods) do
-		print(GetVehicleHandlingFloat(vehicle, "CHandlingData", value[1]))
+		print(GetVehicleHandlingFloat)
 	end
 end
 
@@ -92,4 +98,3 @@ function IsVehicleClassWhitelisted(vehicleClass)
 
 	return false
 end
-
